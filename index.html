@@ -1,0 +1,714 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Art Studio视觉GuideTour 竖版</title>
+  <style>
+    :root {
+      --sf-font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+      --gray-50: #F9F9F9;
+      --gray-100: #F2F2F7;
+      --gray-200: #E5E5EA;
+      --gray-300: #D1D1D6;
+      --gray-400: #C7C7CC;
+      --gray-500: #AEAEB2;
+      --gray-600: #8E8E93;
+      --gray-700: #636366;
+      --gray-800: #3A3A3C;
+      --gray-900: #2C2C2E;
+      --black: #1C1C1E;
+      --bg-light: #FFFFFF;
+      --bg-dark: #000000;
+      --text-light: #1C1C1E;
+      --text-dark: #F2F2F7;
+      --border-radius: 14px;
+      --card-shadow: 0 1px 8px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04);
+      --dark-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: var(--sf-font);
+    }
+    body {
+      background-color: var(--bg-light);
+      color: var(--text-light);
+      line-height: 1.5;
+      transition: background-color 0.3s, color 0.3s;
+      padding: 28px;
+    }
+    body.dark {
+      background-color: var(--bg-dark);
+      color: var(--text-dark);
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+    h1 {
+      font-size: 32px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      letter-spacing: -0.02em;
+    }
+    .subtitle {
+      font-size: 17px;
+      color: var(--gray-700);
+      font-weight: 400;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    body.dark .subtitle {
+      color: var(--gray-400);
+    }
+    .main-content {
+      display: grid;
+      grid-template-columns: auto 380px;
+      gap: 28px;
+      align-items: start;
+    }
+    .kv-container {
+      position: relative;
+      border-radius: var(--border-radius);
+      overflow: hidden;
+      box-shadow: var(--card-shadow);
+      background-color: var(--bg-light);
+      width: 100%;
+      max-width: 600px;
+      aspect-ratio: 753 / 1127;
+    }
+    body.dark .kv-container {
+      box-shadow: var(--dark-shadow);
+      background-color: var(--black);
+    }
+    .kv-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .highlight-area {
+      position: absolute;
+      border: 2px solid transparent;
+      background-color: rgba(0,0,0,0);
+      cursor: pointer;
+      z-index: 10;
+      border-radius: 8px;
+    }
+    .highlight-area:hover {
+      border-color: var(--gray-900);
+      background-color: rgba(0,0,0,0.08);
+    }
+    .highlight-area.active {
+      border-color: var(--gray-900);
+      background-color: rgba(0,0,0,0.12);
+    }
+    body.dark .highlight-area:hover {
+      border-color: var(--gray-100);
+      background-color: rgba(255,255,255,0.15);
+    }
+    body.dark .highlight-area.active {
+      border-color: var(--gray-100);
+      background-color: rgba(255,255,255,0.2);
+    }
+    .highlight-label {
+      position: absolute;
+      top: 0;
+      left: 0;
+      background-color: var(--gray-900);
+      color: white;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 3px 8px;
+      border-radius: 6px 0 6px 0;
+      opacity: 0;
+      letter-spacing: 0.3px;
+      pointer-events: none;
+      z-index: 11;
+    }
+    body.dark .highlight-label {
+      background-color: var(--gray-100);
+      color: var(--black);
+    }
+    .highlight-area:hover .highlight-label,
+    .highlight-area.active .highlight-label {
+      opacity: 1;
+    }
+    .handle {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background: var(--gray-900);
+      border: 2px solid var(--bg-light);
+      border-radius: 2px;
+      opacity: 0;
+      transition: opacity 0.2s;
+      z-index: 12;
+    }
+    body.dark .handle {
+      background: var(--gray-100);
+      border-color: var(--gray-900);
+    }
+    .highlight-area:hover .handle,
+    .highlight-area.active .handle {
+      opacity: 1;
+    }
+    .handle.top-left { top: -4px; left: -4px; }
+    .handle.top-right { top: -4px; right: -4px; }
+    .handle.bottom-left { bottom: -4px; left: -4px; }
+    .handle.bottom-right { bottom: -4px; right: -4px; }
+    .info-sidebar {
+      border-radius: var(--border-radius);
+      background-color: var(--gray-50);
+      box-shadow: var(--card-shadow);
+      overflow: hidden;
+      transition: all 0.3s;
+      border: 1px solid var(--gray-200);
+    }
+    body.dark .info-sidebar {
+      background-color: var(--black);
+      box-shadow: var(--dark-shadow);
+      border-color: var(--gray-900);
+    }
+    .info-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--gray-200);
+      background-color: var(--bg-light);
+    }
+    body.dark .info-header {
+      border-bottom-color: var(--gray-900);
+      background-color: var(--gray-900);
+    }
+    .info-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-light);
+      letter-spacing: -0.01em;
+    }
+    body.dark .info-title {
+      color: var(--text-dark);
+    }
+    .info-content {
+      padding: 24px;
+      font-size: 15px;
+      max-height: 600px;
+      overflow-y: auto;
+      line-height: 1.8;
+    }
+    .info-default {
+      color: var(--gray-600);
+      text-align: center;
+      padding: 40px 20px;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+    body.dark .info-default {
+      color: var(--gray-500);
+    }
+    .info-item {
+      margin-bottom: 20px;
+      padding: 12px;
+      background: var(--bg-light);
+      border-left: 4px solid var(--gray-200);
+    }
+    body.dark .info-item {
+      background: var(--black);
+      border-left: 4px solid var(--gray-700);
+    }
+    .info-item-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 8px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--gray-200);
+    }
+    body.dark .info-item-title {
+      border-bottom-color: var(--gray-700);
+    }
+    .info-item-content {
+      font-size: 15px;
+      line-height: 1.6;
+    }
+    .info-item-content p {
+      margin: 8px 0;
+    }
+    .info-item-content ul {
+      list-style: disc;
+      padding-left: 20px;
+      margin: 8px 0;
+    }
+    .info-item-content li {
+      margin-bottom: 4px;
+    }
+    .numbered-list {
+      counter-reset: item;
+      list-style: none;
+      padding-left: 0;
+    }
+    .numbered-list li {
+      counter-increment: item;
+      margin-bottom: 8px;
+      position: relative;
+      padding-left: 28px;
+    }
+    .numbered-list li:before {
+      content: counter(item) ".";
+      position: absolute;
+      left: 0;
+      top: 0;
+      font-weight: 500;
+      color: var(--gray-900);
+    }
+    body.dark .numbered-list li:before {
+      color: var(--gray-300);
+    }
+    /* 新增：小框样式 */
+    .detail-box {
+      margin: 8px 0;
+      padding: 8px;
+      background-color: var(--gray-100);
+      border: 1px solid var(--gray-200);
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    body.dark .detail-box {
+      background-color: var(--gray-700);
+      border-color: var(--gray-600);
+      color: var(--text-dark);
+    }
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: var(--bg-light);
+      border: 1px solid var(--gray-200);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 20;
+      transition: all 0.3s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    body.dark .theme-toggle {
+      background-color: var(--gray-900);
+      border-color: var(--gray-800);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+    .theme-toggle:hover {
+      transform: scale(1.05);
+    }
+    .theme-toggle:active {
+      transform: scale(0.95);
+    }
+    .icon {
+      width: 22px;
+      height: 22px;
+      stroke-width: 1.5;
+    }
+    .hidden {
+      display: none;
+    }
+    .tooltip {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: rgba(28,28,30,0.9);
+      color: white;
+      padding: 10px 18px;
+      border-radius: 30px;
+      font-size: 14px;
+      font-weight: 500;
+      opacity: 0.95;
+      z-index: 15;
+      letter-spacing: 0.2px;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      pointer-events: none;
+    }
+    body.dark .tooltip {
+      background-color: rgba(242,242,247,0.2);
+    }
+  </style>
+</head>
+<body>
+  <button class="theme-toggle" id="theme-toggle" title="切换暗黑/亮色模式">
+    <svg xmlns="http://www.w3.org/2000/svg" id="light-icon" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0"></path>
+    </svg>
+    <svg xmlns="http://www.w3.org/2000/svg" id="dark-icon" class="icon hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+    </svg>
+  </button>
+  
+  <div class="container">
+    <header>
+      <h1>Art Studio视觉GuideTour 竖版</h1>
+      <p class="subtitle">鼠标悬浮各元素，查看设计规范与说明</p>
+    </header>
+    
+    <div class="main-content">
+      <div class="kv-container" id="kv-container">
+        <img src="image.png" alt="竖版KV" class="kv-image" id="kv-image">
+        <div class="highlight-area" id="editable-logo" style="left: 74.28%; top: 1.33%; width: 22%; height: 4.26%;">
+          <div class="highlight-label">Logo</div>
+          <div class="handle top-left"></div>
+          <div class="handle top-right"></div>
+          <div class="handle bottom-left"></div>
+          <div class="handle bottom-right"></div>
+        </div>
+        <div class="highlight-area" id="editable-slogan" style="left: 17.72%; top: 71.16%; width: 64.75%; height: 4%;">
+          <div class="highlight-label">产品传播名</div>
+          <div class="handle top-left"></div>
+          <div class="handle top-right"></div>
+          <div class="handle bottom-left"></div>
+          <div class="handle bottom-right"></div>
+        </div>
+        <div class="highlight-area" id="editable-xmage" style="left: 74.78%; top: 75.78%; width: 7.47%; height: 1.92%;">
+          <div class="highlight-label">XMAGE字标</div>
+          <div class="handle top-left"></div>
+          <div class="handle top-right"></div>
+          <div class="handle bottom-left"></div>
+          <div class="handle bottom-right"></div>
+        </div>
+        <div class="highlight-area" id="slogan-area" style="left: 28.52%; top: 78.85%; width: 43%; height: 5.68%;">
+          <div class="highlight-label">SLOGAN</div>
+          <div class="handle top-left"></div>
+          <div class="handle top-right"></div>
+          <div class="handle bottom-left"></div>
+          <div class="handle bottom-right"></div>
+        </div>
+        <div class="highlight-area" id="editable-feature-text" style="left: 17.03%; top: 87.74%; width: 65.74%; height: 2.84%;">
+          <div class="highlight-label">卖点KSP</div>
+          <div class="handle top-left"></div>
+          <div class="handle top-right"></div>
+          <div class="handle bottom-left"></div>
+          <div class="handle bottom-right"></div>
+        </div>
+        <div class="highlight-area" id="editable-hotspot-1" style="left: 9.22%; top: 11.2%; width: 84.39%; height: 45.78%;">
+          <div class="highlight-label">产品画面</div>
+          <div class="handle top-left"></div>
+          <div class="handle top-right"></div>
+          <div class="handle bottom-left"></div>
+          <div class="handle bottom-right"></div>
+        </div>
+        <div class="highlight-area" id="editable-hotspot-2" style="left: 65.69%; top: 93.44%; width: 31.3%; height: 4.24%;">
+          <div class="highlight-label">Disclaimer</div>
+          <div class="handle top-left"></div>
+          <div class="handle top-right"></div>
+          <div class="handle bottom-left"></div>
+          <div class="handle bottom-right"></div>
+        </div>
+        <div class="tooltip" id="tooltip">鼠标悬浮或点击查看设计规范</div>
+      </div>
+      
+      <div class="info-sidebar" id="info-sidebar">
+        <div class="info-header">
+          <h3 class="info-title" id="info-title">视觉设计规范</h3>
+        </div>
+        <div class="info-content" id="info-content">
+          <div class="info-default">
+            <p>将鼠标悬浮在图片上的高亮区域<br>查看对应设计规范与说明</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const themeToggle = document.getElementById("theme-toggle");
+      const lightIcon = document.getElementById("light-icon");
+      const darkIcon = document.getElementById("dark-icon");
+      const infoTitle = document.getElementById("info-title");
+      const infoContent = document.getElementById("info-content");
+      const tooltip = document.getElementById("tooltip");
+      const kvImage = document.getElementById("kv-image");
+      const highlightAreas = document.querySelectorAll(".highlight-area");
+      let activeArea = null;
+      
+      const areaContents = {
+        "editable-logo": {
+          title: "HUAWEI LOGO",
+          content: `
+            <div class="info-item">
+              <div class="info-item-title">HUAWEI LOGO</div>
+              <div class="info-item-content">
+                <ol class="numbered-list">
+                  <li>文件模板：HUAWEI Logo（横版、竖版、字标）：<a href="https://3ms.huawei.com/documents/docinfo/389945973017399296" target="_blank">查看链接</a></li>
+                  <li>含LOGO的完稿标准模板：<a href="https://onebox.huawei.com/p/3b0870d8b3fb989b86045374ea9b54a2" target="_blank">查看链接</a></li>
+                </ol>
+                <p>更多使用规范详见《CBG 华为视觉识别规范V2.1》：
+                  <a href="https://3ms.huawei.com/documents/docinfo/477295738862387200" target="_blank">查看链接</a></p>
+              </div>
+            </div>
+          `
+        },
+        "editable-slogan": {
+          title: "产品传播名",
+          content: `
+            <div class="info-item">
+              <div class="info-item-title">产品传播名</div>
+              <div class="info-item-content">
+                <ol class="numbered-list">
+                  <li>位置间距：<br>
+                    <div class="detail-box">
+                      以华为LOGO中“H”高度为一个基本单位尺寸，产品名与广告语行间距为1.50H；<br>
+                      产品名与XMAGE Logo行间距为0.25H；<br>
+                      产品名与产品卖点左右等宽对齐；产品名与广告语及产品卖点居中对齐
+                    </div>
+                  </li>
+                  <li>终端产品传播名使用规范（通用）：<a href="https://onebox.huawei.com/p/50260c2e96c384ed7dfc855eb8fa4eec" target="_blank">查看链接</a></li>
+                  <li>KV文字组合：<br>
+                    <div class="detail-box">
+                      产品名、广告语及卖点组合按使用规范组合使用，文字组合在画面中上下居中，<br>
+                      到左右边的距离相等，不可拆分，不可随意改变颜色，组合宽度不大于整幅画面的64%
+                    </div>
+                  </li>
+                </ol>
+              </div>
+            </div>
+          `
+        },
+        "editable-xmage": {
+          title: "XMAGE字标",
+          content: `
+            <div class="info-item">
+              <div class="info-item-title">XMAGE字标</div>
+              <div class="info-item-content">
+                <ol class="numbered-list">
+                  <li>位置间距：XMAGE Logo高度为0.50H；XMAGE Logo与广告语行间距为0.75H；广告语与产品卖点行间距为1.50H</li>
+                  <li>色值参考：PANTONE 186C，RGB 200/16/46，CMYK 27/100/86/0，HEX #CE0E2D</li>
+                  <li>字标模板：<a href="https://3ms.huawei.com/documents/docinfo/775070380629831680?attachmentIdx=3" target="_blank">查看链接</a></li>
+                  <li>更多使用规范详见《XMAGE Awards 2024视觉识别规范》：
+                    <a href="https://3ms.huawei.com/documents/docinfo/775070380629831680" target="_blank">查看链接</a>
+                  </li>
+                </ol>
+              </div>
+            </div>
+          `
+        },
+        "slogan-area": {
+          title: "SLOGAN",
+          content: `
+            <div class="info-item">
+              <div class="info-item-title">SLOGAN</div>
+              <div class="info-item-content">
+                <ol class="numbered-list">
+                  <li>字体要求：
+                    <div class="detail-box">
+                      <p>中文：方正兰亭黑简体常规；英文：Huawei Sans Regular</p>
+                      <p>更多字体规范说明见公司字体 (中文&amp;英文) 使用指导细则 V3.0：
+                        <a href="https://w3.huawei.com/info/cn/doc/viewDoc.do?did=17895073&amp;cata=595173" target="_blank">查看链接</a>
+                      </p>
+                      <p>华为所有版权字体模板：
+                        <a href="https://onebox.huawei.com/p/ae619a1e3a938461df1724345bbf3a58" target="_blank">查看链接</a>
+                      </p>
+                    </div>
+                  </li>
+                  <li>位置间距：
+                    <div class="detail-box">
+                      以华为LOGO中“H”高度为基本单位，产品名与广告语行间距为1.50H；<br>
+                      产品名与产品卖点左右等宽
+                    </div>
+                  </li>
+                  <li>KV文字组合：
+                    <div class="detail-box">
+                      组合后文本在画面中上下居中，到左右边距相等，<br>
+                      不可拆分，不可随意改变颜色，宽度不大于整幅画面的64%
+                    </div>
+                  </li>
+                </ol>
+              </div>
+            </div>
+          `
+        },
+        "editable-feature-text": {
+          title: "卖点KSP",
+          content: `
+            <div class="info-item">
+              <div class="info-item-title">卖点KSP</div>
+              <div class="info-item-content">
+                <ol class="numbered-list">
+                  <li>字体要求：
+                    <div class="detail-box">
+                      <p>中文：方正兰亭黑简体常规；英文：Huawei Sans Regular</p>
+                      <p>更多字体规范说明见公司字体 (中文&amp;英文) 使用指导细则 V3.0：
+                        <a href="https://w3.huawei.com/info/cn/doc/viewDoc.do?did=17895073&amp;cata=595173" target="_blank">查看链接</a>
+                      </p>
+                      <p>华为所有版权字体模板：
+                        <a href="https://onebox.huawei.com/p/ae619a1e3a938461df1724345bbf3a58" target="_blank">查看链接</a>
+                      </p>
+                    </div>
+                  </li>
+                  <li>位置间距：
+                    <div class="detail-box">
+                      产品名与广告语及产品卖点居中对齐；广告语左右缩进各为2.35H
+                    </div>
+                  </li>
+                  <li>KV文字组合：
+                    <div class="detail-box">
+                      组合后文本在画面中上下居中，到左右边距相等，<br>
+                      不可拆分，不允许随意更改颜色，宽度不大于整幅画面的64%
+                    </div>
+                  </li>
+                </ol>
+              </div>
+            </div>
+          `
+        },
+        "editable-hotspot-1": {
+          title: "产品画面",
+          content: `
+            <div class="info-item">
+              <div class="info-item-title">产品画面</div>
+              <div class="info-item-content">
+                <ol class="numbered-list">
+                  <li>广品面面放在画面上侧位置，不超过画面高度的63%</li>
+                </ol>
+              </div>
+            </div>
+          `
+        },
+        "editable-hotspot-2": {
+          title: "Disclaimer",
+          content: `
+            <div class="info-item">
+              <div class="info-item-title">Disclaimer</div>
+              <div class="info-item-content">
+                <ol class="numbered-list">
+                  <li>字体要求：
+                    <div class="detail-box">
+                      <p>中文：方正兰亭黑简体，45px，行距75px；英文：Huawei Sans Regular，54px，行距67px</p>
+                    </div>
+                  </li>
+                  <li>更多字体规范说明见公司字体 (中文&amp;英文) 使用指导细则 V3.0：
+                    <a href="https://w3.huawei.com/info/cn/doc/viewDoc.do?did=17895073&amp;cata=595173" target="_blank">查看链接</a>
+                  </li>
+                  <li>华为所有版权字体模板：
+                    <a href="https://onebox.huawei.com/p/ae619a1e3a938461df1724345bbf3a58" target="_blank">查看链接</a>
+                  </li>
+                  <li>位置间距：
+                    <div class="detail-box">
+                      免责声明位于画面右下角，距离右侧为2X
+                    </div>
+                  </li>
+                </ol>
+              </div>
+            </div>
+          `
+        }
+      };
+      
+      setTimeout(() => {
+        tooltip.style.opacity = "0";
+        setTimeout(() => { tooltip.style.display = "none"; }, 500);
+      }, 3000);
+      
+      highlightAreas.forEach(area => {
+        area.addEventListener("mouseenter", function() {
+          if (!activeArea) { showAreaInfo(this.id); }
+        });
+        area.addEventListener("mouseleave", function() {
+          if (!activeArea) { showDefaultInfo(); }
+        });
+        area.addEventListener("click", function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          if (activeArea === this.id) {
+            activeArea = null;
+            this.classList.remove("active");
+            showDefaultInfo();
+          } else {
+            if (activeArea) {
+              const prev = document.getElementById(activeArea);
+              if (prev) prev.classList.remove("active");
+            }
+            activeArea = this.id;
+            this.classList.add("active");
+            showAreaInfo(this.id);
+          }
+        });
+      });
+      
+      kvImage.addEventListener("click", function(e) {
+        if (e.target === this && activeArea) {
+          const cur = document.getElementById(activeArea);
+          if (cur) cur.classList.remove("active");
+          activeArea = null;
+          showDefaultInfo();
+        }
+      });
+      
+      themeToggle.addEventListener("click", function() {
+        document.body.classList.toggle("dark");
+        updateThemeIcon();
+        try {
+          localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+        } catch (e) { console.log("无法保存主题设置"); }
+      });
+      
+      function showAreaInfo(areaId) {
+        const data = areaContents[areaId];
+        if (data) {
+          infoTitle.textContent = data.title;
+          infoContent.innerHTML = data.content;
+          infoContent.scrollTop = 0;
+        } else {
+          console.error("未找到区域内容:", areaId);
+        }
+      }
+      
+      function showDefaultInfo() {
+        infoTitle.textContent = "视觉设计规范";
+        infoContent.innerHTML = `
+          <div class="info-default">
+            <p>将鼠标悬浮在图片上的高亮区域<br>查看对应设计规范与说明</p>
+          </div>
+        `;
+      }
+      
+      function updateThemeIcon() {
+        if (document.body.classList.contains("dark")) {
+          lightIcon.classList.add("hidden");
+          darkIcon.classList.remove("hidden");
+        } else {
+          lightIcon.classList.remove("hidden");
+          darkIcon.classList.add("hidden");
+        }
+      }
+      
+      function initTheme() {
+        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        try {
+          const saved = localStorage.getItem("theme");
+          if (saved) {
+            if (saved === "dark") { document.body.classList.add("dark"); }
+            updateThemeIcon();
+            return;
+          }
+        } catch(e) { console.log("访问localStorage失败，使用系统偏好"); }
+        if (prefersDark) { document.body.classList.add("dark"); }
+        updateThemeIcon();
+        window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", event => {
+          if (event.matches) { document.body.classList.add("dark"); }
+          else { document.body.classList.remove("dark"); }
+          updateThemeIcon();
+        });
+      }
+      
+      initTheme();
+    });
+  </script>
+
+
+</body></html>
